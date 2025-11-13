@@ -74,7 +74,3 @@ Perfeito para:
 - Atendimento instantâneo  
 - Empresas que querem parecer grandes mesmo com equipe pequena  
 
----
-
-## 📄 Estrutura recomendada do repositório
-
