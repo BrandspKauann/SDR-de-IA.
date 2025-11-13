@@ -1,106 +1,51 @@
-🌐 SDR de IA — Workflow N8N
+# 🤖 SDR de IA — Workflow N8N
 
-Um SDR Conversacional de IA desenvolvido em N8N, capaz de qualificar leads, entender diferentes formatos de mensagem, manter contexto e agendar reuniões automaticamente no Google Calendar.
+Um **SDR Conversacional Automatizado**, desenvolvido em **N8N**, capaz de qualificar leads, interpretar diferentes formatos de mensagem e **agendar reuniões automaticamente** usando IA e integrações nativas.
 
-⚡ Visão Geral
+---
 
-Este workflow atua como um SDR automatizado, realizando:
+## 📌 Visão Geral
 
-Atendimento inicial via WhatsApp
+Este workflow atua como um **Sales Development Representative (SDR) de IA**, realizando:
 
-Interpretação de texto, áudio, imagem e PDF
+- Atendimento inicial via WhatsApp  
+- Entendimento de **texto, áudio, imagens e PDF**  
+- Processamento com **LLM** (IA generativa)  
+- **Memória conversacional** via Redis  
+- Sugestão e captura de horários  
+- **Criação automática de eventos** no Google Calendar  
+- Envio de confirmação estruturada ao usuário  
 
-Respostas inteligentes usando LLM
+Tudo de forma 100% automatizada, sem intervenção humana.
 
-Memória conversacional (Redis)
+---
 
-Sugestão e captura de horários
+## 🔁 Arquitetura do Fluxo
 
-Agendamento automático no Google Calendar
+```mermaid
+flowchart TD
 
-Envio de confirmação estruturada ao usuário
+A[📥 Recebimento via WhatsApp] --> B{🔀 Tipo de Mensagem?}
 
-Tudo orquestrado sem intervenção humana.
+B -->|Texto| C1[📝 Processamento de Texto]
+B -->|Áudio| C2[🎧 Transcrição (Whisper)]
+B -->|Imagem| C3[🖼️ OCR / Resposta Padrão]
+B -->|PDF| C4[📄 Extração / Resposta Padrão]
+B -->|Outro| C5[⚠️ Aviso de Formato Inválido]
 
-🔁 Fluxo (Resumo)
-📥 WhatsApp → 🔀 Identificação do Formato → 🎧 Transcrição/OCR
-     → 🤖 Agente de IA (LLM) → 🧠 Memória (Redis)
-     → 🗓️ Verificação de Agenda → 📅 Criação do Evento
-     → 📩 Confirmação via WhatsApp
+C1 --> D[🤖 Agente de IA]
+C2 --> D
+C3 --> D
+C4 --> D
 
-🧱 Componentes Principais
-1. Recepção de Mensagens
+D --> E[🧠 Memória (Redis)]
+E --> F[📩 Enviar Resposta ao Lead]
 
-Webhook N8N para receber mensagens do WhatsApp
+F --> G{📅 Lead forneceu horário e e-mail?}
 
-Suporte a texto, áudio, imagem, PDF
+G -->|Sim| H[🗓️ Verificar Agenda - Google Calendar]
+H --> I[📅 Criar Evento]
+I --> J[🤖 IA de Confirmação]
+J --> K[📩 Enviar Confirmação]
 
-2. Processamento Multimodal
-
-Áudio → transcrição (OpenAI Whisper)
-
-Documentos → retorno padronizado
-
-Texto → enviado direto ao LLM
-
-3. Agente de IA (LLM)
-
-Analisa intenção
-
-Qualifica lead
-
-Identifica informações de reunião
-
-Mantém coerência e fluxo conversacional
-
-4. Memória Conversacional
-
-Redis com chave por número do lead
-
-Mantém contexto de últimas mensagens
-
-5. Agendamento Automático
-
-Verificação de disponibilidade no Calendar
-
-Criação do evento com:
-
-horário
-
-descrição
-
-participante
-
-link de reunião
-
-6. Confirmação via WhatsApp
-
-IA gera mensagem de confirmação
-
-Envio automático pelo provedor WhatsApp API
-
-🛠 Tecnologias Utilizadas
-
-N8N
-
-OpenAI Whisper / LLM
-
-DeepSeek (respostas auxiliares)
-
-Redis
-
-Google Calendar API
-
-Z-API / WhatsApp API
-
-🚀 Destaques do Workflow
-
-Conversa fluida com memória
-
-Totalmente multimodal
-
-Agendamento sem intervenção manual
-
-Arquitetura limpa e modular
-
-Fácil de adaptar para qualquer empresa ou contexto
+G -->|Não| L[⏳ Seguir Fluxo Conversacional]
