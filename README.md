@@ -1,76 +1,254 @@
-# 🤖 SDR de IA — Atendente Comercial Automatizado (N8N)
+# 🤖 SDR de IA Brandsp – Atendimento e Qualificação via WhatsApp
 
-Este projeto é um **SDR de IA**: um atendente digital que conversa com leads pelo WhatsApp, entende o que eles precisam e até **agenda reuniões automaticamente**.
-
-Ele funciona 24h por dia, responde rápido, não esquece nada e mantém um atendimento profissional em todas as etapas.
+> **SDR inteligente, consultivo e orientado a agendamento**, operando 100% via WhatsApp com IA, memória de contexto e integração com agenda.
 
 ---
 
-## ✨ O que este SDR de IA faz?
+## 🧭 Visão Geral
 
-- 📥 Recebe mensagens pelo WhatsApp  
-- 💬 Entende texto, áudio, imagem e PDF  
-- 🤖 Responde como um atendente profissional  
-- 🔍 Identifica a necessidade do lead  
-- 📌 Coleta dados importantes (nome, e-mail, horário desejado)  
-- 📅 Consulta a agenda  
-- 🗓️ Cria a reunião automaticamente  
-- 📩 Envia a confirmação para o lead  
+Este workflow implementa o **SDR de IA da Brandsp**, responsável por:
 
-Tudo sozinho, sem intervenção humana.
+* 📥 Receber mensagens via WhatsApp
+* 🔀 Identificar o tipo de conteúdo (texto, áudio, imagem, PDF)
+* 🧠 Interpretar e contextualizar mensagens com IA
+* 💬 Conduzir conversas de vendas consultivas
+* 📅 Agendar reuniões automaticamente
+* ✅ Confirmar reuniões em tempo real
 
----
-
-## 🚀 Como funciona (visão simples)
-
-1. O lead envia uma mensagem  
-2. A IA entende o que ele quer  
-3. Se for áudio, ela transcreve  
-4. Se for texto, ela responde direto  
-5. A conversa vai evoluindo naturalmente  
-6. Quando o lead quer reunião → a IA pergunta o horário  
-7. O sistema consulta o calendário  
-8. Se estiver livre → agenda  
-9. A IA envia a confirmação no WhatsApp  
-
-Simples assim.
+O SDR atua como **pré-vendas (Sales Development Representative)**, qualificando leads e encaminhando apenas oportunidades reais para o closer.
 
 ---
 
-## 🧠 Por que esse SDR é tão bom?
+## 🏗️ Arquitetura Geral
 
-- Não cansa  
-- Não perde oportunidades  
-- É rápido, educado e direto  
-- Mantém o contexto da conversa  
-- Consegue qualificar leads sozinho  
-- Automatiza toda a etapa chata do processo comercial  
-
-Ideal para quem quer **ganhar escala**, mas sem aumentar equipe.
+```
+[ Lead no WhatsApp ]
+          |
+          v
+[ Webhook WhatsApp ]
+          |
+          v
+[ Separação de Formato ]
+  |    |    |    |
+ Texto Áudio Img  PDF
+  |    |    |    |
+  +----+----+----+
+          |
+          v
+[ SDR IA (Contexto + Memória) ]
+          |
+          v
+[ Envio de Resposta ]
+          |
+          v
+[ Verifica Agendamento ]
+      |          |
+     Não        Sim
+      |          |
+      v          v
+ [ Continua ] [ Google Calendar ]
+                     |
+                     v
+            [ Confirmação WhatsApp ]
+```
 
 ---
 
-## 🛠 O que ele utiliza por baixo dos panos (explicação simples)
+## 🧰 Tecnologias Utilizadas
 
-- **N8N** — para orquestrar tudo  
-- **IA Generativa (LLM)** — para conversar com o lead  
-- **Reconhecimento de áudio** — para entender mensagens de voz  
-- **Memória** — para lembrar do que o lead disse antes  
-- **Google Calendar** — para marcar reuniões  
-- **WhatsApp API** — para enviar e receber mensagens  
-
-Você não precisa configurar nada disso manualmente — o fluxo já faz tudo.
+| Camada       | Tecnologia             | Função                       |
+| ------------ | ---------------------- | ---------------------------- |
+| Orquestração | **n8n**                | Backend conversacional       |
+| Canal        | **WhatsApp (Z-API)**   | Entrada e saída de mensagens |
+| IA           | **OpenAI (LangChain)** | Conversa e qualificação      |
+| IA Auxiliar  | **DeepSeek**           | Confirmação de reunião       |
+| Memória      | **Redis**              | Histórico de conversa        |
+| Agenda       | **Google Calendar**    | Agendamento automático       |
 
 ---
 
-## 📦 Para que serve este projeto?
+## 🔌 Entrada – Webhook WhatsApp
 
-Perfeito para:
+**Endpoint:**
 
-- Automações comerciais  
-- Pré-venda  
-- Qualificação de leads  
-- Captura automática de reuniões  
-- Atendimento instantâneo  
-- Empresas que querem parecer grandes mesmo com equipe pequena  
+```
+POST /webhook/sdrbrandsp
+```
 
+Recebe eventos do WhatsApp contendo:
+
+* Texto
+* Áudio
+* Imagem
+* Documento (PDF)
+
+---
+
+## 🔀 Separação Inteligente de Formato
+
+**Node:** `Separar Formato do Recebimento`
+
+Identifica automaticamente o tipo de mensagem:
+
+* 📝 Texto
+* 🎤 Áudio
+* 🖼️ Imagem
+* 📄 Documento
+
+Cada formato segue um fluxo específico até ser convertido em **texto interpretável pela IA**.
+
+---
+
+## 🎤 Processamento de Áudio
+
+Fluxo:
+
+```
+WhatsApp → Download do áudio → Transcrição (OpenAI) → Texto
+```
+
+Permite que o lead fale por áudio normalmente, mantendo a fluidez da conversa.
+
+---
+
+## 🖼️ / 📄 Imagem e PDF
+
+Mensagens com imagem ou documento:
+
+* São identificadas
+* Processadas
+* Respondidas de forma contextual
+
+> O SDR orienta o lead caso o formato não seja adequado.
+
+---
+
+## 🧠 SDR BRANDSP (Coração do Sistema)
+
+**Node:** `SDR BRANDSP`
+
+A IA assume o papel de **SDR consultivo sênior**, com:
+
+* Persona definida (Brandsp IA)
+* Tom profissional, simpático e humano
+* Roteiro de vendas estruturado
+* Tabela completa de serviços e valores
+
+### Estratégia Conversacional
+
+1. **Mapear dor**
+2. **Entender maturidade digital**
+3. **Relacionar dor → solução Brandsp**
+4. **Apresentar orçamento quando houver interesse**
+5. **Propor reunião**
+
+---
+
+## 🧠 Memória Conversacional
+
+**Node:** `Memória REDIS`
+
+* Armazena histórico por número de telefone
+* Mantém contexto entre mensagens
+* Evita perguntas repetidas
+* Permite conversas longas e naturais
+
+---
+
+## 💬 Envio de Respostas
+
+**Node:** `Enviar Mensagem`
+
+* Retorna a resposta da IA via WhatsApp
+* Comunicação em tempo real
+* Linguagem natural
+
+---
+
+## 📅 Detecção de Agendamento
+
+**Node:** `Agendou reunião?`
+
+Analisa a resposta da IA procurando:
+
+* `start_datetime`
+* `end_datetime`
+* `email`
+
+Se detectado, o fluxo segue para agendamento automático.
+
+---
+
+## 📆 Agendamento Automático
+
+**Node:** `Agendar Reunião`
+
+* Cria evento no Google Calendar
+* Gera link do Google Meet
+* Adiciona o e-mail do lead
+
+---
+
+## ✅ Confirmação da Reunião
+
+**Nodes:**
+
+* `IA Confirmação de Reunião`
+* `Envio da confirmação`
+
+A IA gera uma mensagem clara contendo:
+
+* Data
+* Horário
+* Link da reunião
+
+Tudo enviado automaticamente pelo WhatsApp.
+
+---
+
+## 📐 Formulação do Problema
+
+### 🎯 Objetivo
+
+Converter conversas no WhatsApp em **reuniões qualificadas**, sem esforço humano.
+
+---
+
+### 🔢 Variáveis
+
+* **N** = número de conversas
+* **M** = mensagens por conversa
+* **Cᵢ** = custo por interação de IA
+* **R** = taxa de agendamento
+
+---
+
+### ⏱️ Complexidade
+
+* Temporal: **O(N × M)**
+* Cada mensagem é processada uma vez
+
+---
+
+### 💰 Custo estimado
+
+```
+Custo ≈ N × M × Cᵢ
+```
+
+---
+
+## 🌟 Diferenciais do SDR de IA
+
+* Atendimento 24/7
+* Zero esquecimento
+* Conversa humanizada
+* Memória persistente
+* Multimodal (texto, áudio, imagem, PDF)
+* Agendamento automático
+
+---
+
+## ✅ Conclusão
+
+Este workflow transforma o **n8n em um SDR de IA completo**, capaz de atender, qualificar, vender e agendar reuniões via WhatsApp, com eficiência comparável a times de pré-vendas enterprise.
